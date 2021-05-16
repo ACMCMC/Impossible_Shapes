@@ -30,3 +30,9 @@
 *.exe
 *.out
 *.app
+
+Includes/
+Debug/
+
+.vs/
+assimp-5.0.1/
