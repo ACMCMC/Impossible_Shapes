@@ -2,14 +2,14 @@
 
 in vec3 FragPos;
 in vec3 Normal;
-in vec2 TexCoord;
+in vec2 UV;
 
 out vec4 FragColor;
 
-uniform vec3 viewPos;
 uniform vec3 lightPos;
 uniform vec3 lightColor;
 uniform vec3 objectColor;
+uniform vec3 viewPos;
 uniform sampler2D tex;
 
 uniform float ambientI;
@@ -36,5 +36,5 @@ void main()
 
 	// combinamos
 	vec3 result = (ambient + diffuse);
-	FragColor = vec4(result, 1.0f) * texture(tex, TexCoord);
+	FragColor = vec4(result, 1.0f) * texture(tex, UV);
 }
