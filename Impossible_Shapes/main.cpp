@@ -174,9 +174,21 @@ private:
 			tiempo = 3;
 			break;
 		case 3:
-			tiempo = 3;
+			tiempo = forward ? 3 : 0;
 			break;
 		case 4:
+			tiempo = forward ? 0 : 1;
+			break;
+		case 5:
+			tiempo = forward ? 1 : 3;
+			break;
+		case 6:
+			tiempo = 3;
+			break;
+		case 7:
+			tiempo = 3;
+			break;
+		case 8:
 			tiempo = 3;
 			forward = 0;
 			break;
@@ -199,7 +211,15 @@ private:
 		case 3:
 			return glm::vec3(190, 160, -20);
 		case 4:
-			return glm::vec3(190, 160, -20);
+			return glm::vec3(-20, 0, -270);
+		case 5:
+			return glm::vec3(-20, 30, -270);
+		case 6:
+			return glm::vec3(-20, 30, 20);
+		case 7:
+			return glm::vec3(230, 30, 20);
+		case 8:
+			return glm::vec3(230, 160, 20);
 		default:
 			return glm::vec3(0, 0, 0);
 		}
@@ -382,12 +402,11 @@ void crearPenroseLateral() {
 
 	unsigned int faces_info[] = {
 		// (id_v1, vt_v1, vn_v1), (id_v2, vt_v2, vn_v2)...
-5, 1, 1, 3, 2, 1, 1, 3, 1,
-2, 4, 2, 7, 5, 2, 1, 3, 2,
-5, 1, 1, 8, 6, 1, 3, 2, 1,
-3, 2, 1, 8, 6, 1, 4, 7, 1,
-4, 7, 1, 8, 6, 1, 6, 8, 1,
-6, 8, 1, 8, 6, 1, 9, 9, 1
+2, 1, 1, 7, 2, 1, 1, 3, 1,
+5, 4, 2, 8, 5, 2, 3, 6, 2,
+3, 6, 2, 8, 5, 2, 4, 7, 2,
+4, 7, 2, 8, 5, 2, 6, 8, 2,
+6, 8, 2, 8, 5, 2, 9, 9, 2
 	};
 
 	glGenVertexArrays(1, &VAOPenroseLateral);
@@ -564,12 +583,13 @@ void display() {
 	glm::mat4 projection = glm::ortho(-((float)SCR_WIDTH / 2.0f), ((float)SCR_WIDTH / 2.0f), -((float)SCR_HEIGHT / 2.0f), ((float)SCR_HEIGHT / 2.0f), -200.0f, 400.0f);
 
 	esfera.setMatWorld(glm::translate(glm::mat4(), myControlador.getPosicion()));
+	//esfera.setMatWorld(glm::translate(glm::mat4(), glm::vec3(posEsferaX, posEsferaY, posEsferaZ)));
 	if (pintarAlgoritmoPintor) {
 		glDisable(GL_DEPTH_TEST);
-		penroseFrontal.dibujar(eye, lookAt, projection);
 		penroseTrasero.dibujar(eye, lookAt, projection);
-		esfera.dibujar(eye, lookAt, projection);
 		penroseLateral.dibujar(eye, lookAt, projection);
+		penroseFrontal.dibujar(eye, lookAt, projection);
+		esfera.dibujar(eye, lookAt, projection);
 		glEnable(GL_DEPTH_TEST);
 	}
 	else {
@@ -597,7 +617,7 @@ int main()
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 	// Creo la ventana
-	GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "AldanCreo", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Proyecto Aldán Creo Mariño", NULL, NULL);
 	if (window == NULL)
 	{
 		std::cout << "Failed to create GLFW window" << std::endl;
@@ -625,7 +645,7 @@ int main()
 	GLuint shaderSinTexturas = setShaders("shader.vert", "shader.frag");
 	GLuint shaderConTexturas = setShaders("shaderTextura.vert", "shaderTextura.frag");
 
-	GLuint cemento = cargarTextura("2k_venus_surface.jpg");
+	GLuint cemento = cargarTextura("2k_earth_daymap.jpg");
 
 	glUniform1i(glGetUniformLocation(shaderConTexturas, "tex"), 0);
 

@@ -21,7 +21,7 @@ void main()
 
 	// luz difusa
 	vec3 norm = normalize(Normal);
-	vec3 lightDir = normalize(lightPos); // No queremos tener en cuenta la posición del fragmento para que no se note la distancia en 3D
+	vec3 lightDir = normalize(lightPos - FragPos); // No queremos tener en cuenta la posición del fragmento para que no se note la distancia en 3D
 	float diferencia = max(dot(norm, lightDir), 0.0f);
 	vec3 luzDifusa = vec3(diferencia) * diffuseI;
 
