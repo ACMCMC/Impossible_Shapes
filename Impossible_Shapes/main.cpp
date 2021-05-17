@@ -158,6 +158,7 @@ private:
 	void cambiarEstado() {
 		if (forward) {
 			estado++;
+			estado = estado % 13;
 		}
 		else {
 			estado--;
@@ -168,27 +169,30 @@ private:
 	void procesarCambioEstado() {
 		glm::vec3 destino = getPosicionEstado(estado);
 		glm::vec3 inicio = getPosicionEstado(forward ? estado - 1 : estado + 1);
+		if (estado == 0 && forward) {
+			inicio = getPosicionEstado(12);
+		}
 		double tiempo;
 		switch (estado)
 		{
 		case 0:
-			tiempo = 3;
+			tiempo = 0.5;
 			forward = 1;
 			break;
 		case 1:
 			tiempo = 3;
 			break;
 		case 2:
-			tiempo = 3;
+			tiempo = 2;
 			break;
 		case 3:
-			tiempo = forward ? 3 : 0;
+			tiempo = forward ? 2 : 0;
 			break;
 		case 4:
 			tiempo = forward ? 0 : 1;
 			break;
 		case 5:
-			tiempo = forward ? 1 : 3;
+			tiempo = forward ? 1 : 2;
 			break;
 		case 6:
 			tiempo = 3;
@@ -197,8 +201,19 @@ private:
 			tiempo = 3;
 			break;
 		case 8:
+			tiempo = 2;
+			break;
+		case 9:
+			tiempo = 2;
+			break;
+		case 10:
+			tiempo = 1;
+			break;
+		case 11:
 			tiempo = 3;
-			forward = 0;
+			break;
+		case 12:
+			tiempo = 3;
 			break;
 		default:
 			estado = 0;
@@ -227,7 +242,15 @@ private:
 		case 7:
 			return glm::vec3(230, 30, 20);
 		case 8:
-			return glm::vec3(230, 160, 20);
+			return glm::vec3(230, 190, 20);
+		case 9:
+			return glm::vec3(230, 190, 142);
+		case 10:
+			return glm::vec3(230, 190, 230);
+		case 11:
+			return glm::vec3(470, 190, 230);
+		case 12:
+			return glm::vec3(470, 480, 230);
 		default:
 			return glm::vec3(0, 0, 0);
 		}
@@ -572,35 +595,52 @@ void display() {
 	glm::mat4 rotacionY = glm::rotate(glm::mat4(1), glm::radians(anguloPlanoY), glm::vec3(0, 1, 0));
 	glm::mat4 rotacionX = glm::rotate(glm::mat4(1), glm::radians(anguloY), glm::vec3(1, 0, 0));
 	vectorPerspectivaIsometrica = rotacionX * rotacionY * glm::vec4(0, 0, 1, 1);
-	glm::vec3 eye = vectorPerspectivaIsometrica * 500.0f + glm::vec3(100, 50, -100);
+	glm::vec3 eye = vectorPerspectivaIsometrica * 1000.0f + glm::vec3(100, 50, -100);
 	glm::vec3 lookAt = glm::vec3(100, 50, -100);
 
-	//lightPos = glm::vec3(sin(glm::radians(glfwGetTime() * 10)) * 100.0f, 100.0f, cos(glm::radians(glfwGetTime() * 10)) * 100.0f);
-	//std::cout << glfwGetTime() * 10 << std::endl;
-	glm::mat4 projection = glm::ortho(-((float)SCR_WIDTH / 2.0f), ((float)SCR_WIDTH / 2.0f), -((float)SCR_HEIGHT / 2.0f), ((float)SCR_HEIGHT / 2.0f), 0.0f, 1000.0f);
+	glm::mat4 projection = glm::ortho(-((float)SCR_WIDTH / 2.0f), ((float)SCR_WIDTH / 2.0f), -((float)SCR_HEIGHT / 2.0f), ((float)SCR_HEIGHT / 2.0f), 0.0f, 2000.0f);
 
 	esfera.setMatWorld(glm::translate(glm::mat4(), myControlador.getPosicion()));
 	//esfera.setMatWorld(glm::translate(glm::mat4(), glm::vec3(posEsferaX, posEsferaY, posEsferaZ)));
 	if (pintarAlgoritmoPintor) {
 		glDisable(GL_DEPTH_TEST);
-		penroseTrasero.dibujar(eye, lookAt, projection);
 		penroseLateral.dibujar(eye, lookAt, projection);
-		penroseFrontal.dibujar(eye, lookAt, projection);
 		esfera.dibujar(eye, lookAt, projection);
+		penroseFrontal.dibujar(eye, lookAt, projection);
+		penroseTrasero.dibujar(eye, lookAt, projection);
 		glEnable(GL_DEPTH_TEST);
 	}
 	else {
-		penroseTrasero.dibujar(eye, lookAt, projection);
-		penroseFrontal.dibujar(eye, lookAt, projection);
 		if (myControlador.getEstado() == 2 && myControlador.getForward() || myControlador.getEstado() == 1 && !myControlador.getForward()) {
+			penroseTrasero.dibujar(eye, lookAt, projection);
+			penroseFrontal.dibujar(eye, lookAt, projection);
 			glDisable(GL_DEPTH_TEST);
 			esfera.dibujar(eye, lookAt, projection);
 			glEnable(GL_DEPTH_TEST);
+			penroseLateral.dibujar(eye, lookAt, projection);
+		}
+		else if ((myControlador.getEstado() == 9) && myControlador.getForward()) {
+			glDisable(GL_DEPTH_TEST);
+			penroseLateral.dibujar(eye, lookAt, projection);
+			esfera.dibujar(eye, lookAt, projection);
+			penroseTrasero.dibujar(eye, lookAt, projection);
+			penroseFrontal.dibujar(eye, lookAt, projection);
+			glEnable(GL_DEPTH_TEST);
+		}
+		else if ((myControlador.getEstado() == 10 || myControlador.getEstado() == 11) && myControlador.getForward()) {
+			glDisable(GL_DEPTH_TEST);
+			esfera.dibujar(eye, lookAt, projection);
+			glEnable(GL_DEPTH_TEST);
+			penroseLateral.dibujar(eye, lookAt, projection);
+			penroseTrasero.dibujar(eye, lookAt, projection);
+			penroseFrontal.dibujar(eye, lookAt, projection);
 		}
 		else {
+			penroseTrasero.dibujar(eye, lookAt, projection);
+			penroseFrontal.dibujar(eye, lookAt, projection);
 			esfera.dibujar(eye, lookAt, projection);
+			penroseLateral.dibujar(eye, lookAt, projection);
 		}
-		penroseLateral.dibujar(eye, lookAt, projection);
 	}
 }
 
@@ -719,6 +759,6 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	std::cout << ", y " << posEsferaY;
 	std::cout << ", z " << posEsferaZ << std::endl << std::endl;
 
-	std::cout << "alfaPY " << anguloPlanoY;
-	std::cout << ", alfaY " << anguloY << std::endl << std::endl;
+	//std::cout << "alfaPY " << anguloPlanoY;
+	//std::cout << ", alfaY " << anguloY << std::endl << std::endl;
 }
