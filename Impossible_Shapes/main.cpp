@@ -35,6 +35,7 @@ float posEsferaY = 0;
 float posEsferaZ = 0;
 
 int pintarAlgoritmoPintor = 0;
+int movimientoAutomatico = 1;
 
 glm::vec3 lightColor = glm::vec3(1.0f, 1.0f, 1.0f);
 glm::vec3 lightPos = glm::vec3(sin(glm::radians(90.0f))*100.0f, 25.0f, cos(glm::radians(90.0f)) * 100.0f);
@@ -600,8 +601,12 @@ void display() {
 
 	glm::mat4 projection = glm::ortho(-((float)SCR_WIDTH / 2.0f), ((float)SCR_WIDTH / 2.0f), -((float)SCR_HEIGHT / 2.0f), ((float)SCR_HEIGHT / 2.0f), 0.0f, 2000.0f);
 
-	esfera.setMatWorld(glm::translate(glm::mat4(), myControlador.getPosicion()));
-	//esfera.setMatWorld(glm::translate(glm::mat4(), glm::vec3(posEsferaX, posEsferaY, posEsferaZ)));
+	if (movimientoAutomatico) {
+		esfera.setMatWorld(glm::translate(glm::mat4(), myControlador.getPosicion()));
+	}
+	else {
+		esfera.setMatWorld(glm::translate(glm::mat4(), glm::vec3(posEsferaX, posEsferaY, posEsferaZ)));
+	}
 	if (pintarAlgoritmoPintor) {
 		glDisable(GL_DEPTH_TEST);
 		penroseLateral.dibujar(eye, lookAt, projection);
@@ -703,6 +708,7 @@ int main()
 	esfera = Objeto(glm::vec3(1.0f, 1.0f, 1.0f), VAOEsfera, 1080, shaderConTexturas);
 	esfera.setDistorsion(glm::vec3(0.2, 0.2, 0.2));
 	esfera.setTextura(cemento);
+	esfera.ambientI = 0.8;
 
 	myControlador.comenzar(glfwGetTime());
 
@@ -754,6 +760,8 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 		posEsferaZ--;
 	if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
 		pintarAlgoritmoPintor = !pintarAlgoritmoPintor;
+	if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS)
+		movimientoAutomatico = !movimientoAutomatico;
 
 	std::cout << "x " << posEsferaX;
 	std::cout << ", y " << posEsferaY;
