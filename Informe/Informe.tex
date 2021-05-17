@@ -88,7 +88,7 @@
 
 El \textbf{triángulo de Penrose} es una figura imposible diseñada en 1934 por el artista sueco Oscar Reutersvärd. Sin embargo, no cobró notoriedad hasta 1954, cuando un matemático, Rodzher Penrouz (de ahí el nombre de la figura) escribió un artículo sobre figuras imposibles, que resultó muy llamativo. Desde ese momento pasó a formar parte de la cultura popular.
 
-\begin{figure}
+\begin{figure}[h]
     \centering
     \resizebox*{0.4\textwidth}{!}{
     \includegraphics{1200px-Penrose_triangle.svg.png}
@@ -100,11 +100,11 @@ La figura tiene el aspecto mostrado en \ref{imagen_triangulo}.
 
 A nivel personal, me resultan especialmente fascinantes todos los temas relacionados con figuras imposibles, y por eso quería que mi proyecto de la asignatura girase en torno a ellas. El triángulo de Penrose me pareció la figura más icónica que existe, entre las figuras imposibles, y por eso he desarrollado mi proyecto sobre la misma.
 
-\subsection{Idea base para el desarrollo}
+\subsection{Idea base para el desarrollo} \label{hocus}
 
 Para hacer el desarrollo, me he basado en un juego de móvil llamado \textit{hocus} \cite{hocus}. El juego se basa en el uso de figuras imposibles, y concretamente tiene un nivel basado en el triángulo de Penrose, mostrado en \ref{nivel_hocus}.
 
-\begin{figure}
+\begin{figure}[h]
     \centering
     \resizebox*{0.4\textwidth}{!}{
     \includegraphics{hocus.jpeg}
@@ -124,15 +124,14 @@ El modelo que descargué venía con todas las caras creadas, incluso las que en 
 
 Por eso eliminé las caras ocultas del modelo, pasando de \ref{caras_ocultas_sin_borrar} a \ref{caras_ocultas_borradas}.
 
-\begin{figure}
+\begin{figure}[h]
     \centering
     \resizebox*{0.8\textwidth}{!}{
     \includegraphics{caras_ocultas_sin_borrar.png}
     }
     \caption{Modelo original, con las caras ocultas sin borrar} \label{caras_ocultas_sin_borrar}
 \end{figure}
-
-\begin{figure}
+\begin{figure}[h]
     \centering
     \resizebox*{0.8\textwidth}{!}{
     \includegraphics{caras_ocultas_borradas.png}
@@ -142,7 +141,7 @@ Por eso eliminé las caras ocultas del modelo, pasando de \ref{caras_ocultas_sin
 
 Además, separé las tres ``caras'' del triángulo, para poder aplicar después el algoritmo del pintor, según las secciones marcadas en rojo en \ref{separacion_caras_triangulo}. Es relevante comentar que, en este documento, llamo ``caras'' a cada una de las tres mallas que he separado, por simplicidad. Técnicamente son mallas compuestas de múltiples caras.
 
-\begin{figure}
+\begin{figure}[h]
     \centering
     \resizebox*{0.6\textwidth}{!}{
     \includegraphics{caras_marcadas.png}
@@ -153,7 +152,18 @@ Además, separé las tres ``caras'' del triángulo, para poder aplicar después 
 También hice el mapeado UV de las mallas, en caso de que quisiera aplicarle una textura posteriormente. Finalmente, deseché esa idea, ya que me pareció que quedaría recargado y sería más elegante un color más plano, como se ve en la versión final de la aplicación. La textura decidí aplicarla a la esfera.
 
 \section{Programación de la aplicación con OpenGL}
+
+En esta sección describiré como he llevado a cabo el proceso de programación de la aplicación.
+
 \subsection{Estructura del código}
+
+He estructurado mi código de forma similar a como he estructurado los códigos de las prácticas de la asignatura.
+
+Concretamente, lo que hecho ha sido una estructura con un bucle de dibujo que se llama por cada frame que haya que dibujar, y que delega la responsabilidad de dibujar los objetos en clases que tienen precisamente ese propósito (es decir, tienen un método para realizar el dibujado de sí mismas). La información de cada objeto está encapsulada en la clase \texttt{Objeto}. Además, mantengo las funciones de crear los VAO, también de prácticas anteriores, y concretamente recurro al \texttt{esfera.h} que se nos proporcionó, para dibujar la esfera de la aplicación. La función de cargar una textura también es heredada de mi código de las prácticas.
+
+Adicionalmente, he creado dos clases encargadas de controlar el movimiento de la esfera. Por un lado, tenemos una clase \texttt{Interpolador}, que describiré más adelante (\ref{interpolador}), y tenemos otra clase \texttt{ControladorEsfera}, que también describiré posteriormente (\ref{controlador_esfera}).
+
+También heredo las funciones \texttt{openGLInit}, \texttt{window\_size\_callback}, etc.
 
 \subsection{Importación del modelo del triángulo}
 
@@ -161,7 +171,7 @@ Desde Blender, exporté el modelo en formato \texttt{.obj}. Este formato permite
 
 El formato del archivo es interpretable de forma bastante directa, así que utilicé expresiones regulares para convertir líneas de la forma \ref{lineas_obj} a vectores, como en \ref{lineas_obj_convertidas}.
 
-\begin{figure}
+\begin{figure}[h]
     \centering
     \begin{minipage}[c]{0.7\textwidth}
         \begin{lstlisting}
@@ -170,7 +180,7 @@ f 1/2/3 2/3/3 3/4/3
     \end{minipage}
     \caption{Línea del fichero \texttt{.obj} que describe una cara.} \label{lineas_obj}
 \end{figure}
-\begin{figure}
+\begin{figure}[h]
     \centering
     \begin{minipage}[c]{0.7\textwidth}
         \begin{lstlisting}
@@ -188,22 +198,123 @@ Pese a todo, como comentaba, realmente son tres mallas separadas, así que en el
 
 Una operación importante que hace el bucle es decrementar en una unidad todas las referencias del vector, ya que el formato \texttt{.obj} utiliza indexado en base a 1, y en C los índices empiezan en 0. Es un aspecto importante, que me llevó cierto tiempo descubrir, ya que inicialmente no aplicaba esta operación, y por ello todos los vértices estaban mal referenciados, dando lugar a un dibujo como el recogido en la figura \ref{antes_de_corregir_indexado}.
 
-\begin{figure}
+\begin{figure}[h]
     \centering
-    \resizebox*{0.6\textwidth}{!}{
+    \resizebox*{0.5\textwidth}{!}{
     \includegraphics{Penrose_1_no_funciona.png}
     }
     \caption{Visualización de la aplicación en etapas previas del desarrollo, antes de tener en cuenta que el indexado de vértices, normales y texturas, en el formato \texttt{.obj}, empieza en 0.} \label{antes_de_corregir_indexado}
 \end{figure}
 
+\subsection{Pespectiva y visión}
+
+La perspectiva que elegido para desarrollar la aplicación es la ortográfica (isométrica), ya que es necesaria para desarrollar este tipo de ilusiones ópticas. He calculado los ángulos adecuados para posicionar la cámara, y los he guardado como un vector que uso a la hora de dibujar para indicar la posición de la cámara.
+
+\subsection{Posicionado} \label{posicion}
+
+\begin{figure}[h]
+    \centering
+    \resizebox*{0.4\textwidth}{!}{
+    \includegraphics{esfera_posicion_lejos.png}
+    }
+    \caption{Posición de la esfera: $(470, 430, 230)$.} \label{esfera_posicion_lejos}
+\end{figure}
+\begin{figure}[h]
+    \centering
+    \resizebox*{0.4\textwidth}{!}{
+    \includegraphics{esfera_posicion_cerca.png}
+    }
+    \caption{Posición de la esfera: $(35, 70, -270)$.} \label{esfera_posicion_cerca}
+\end{figure}
+
+Para posicionar los elementos, he tenido que hacerlo manualmente, ya que precisamente en esta aplicación, al jugar con ilusiones ópticas, las coordenadas 3D aparentes no se corresponden con las reales. Por ejemplo, cuando en el recorrido que hace la esfera automáticamente, esta pasa de la posición \ref{esfera_posicion_lejos} a la posición \ref{esfera_posicion_cerca}, realmente está haciendo un movimiento mucho más grande de lo que parece. Como digo, esto es por el juego óptico que hace la aplicación. Por este motivo, el cálculo de las coordenadas de la esfera lo he hecho de forma manual.
+
 \subsection{Iluminación}
+
+He decidido aplicar iluminación de distintas formas a la esfera y al triángulo. Para eso uso dos shaders separados.
+
+Con respecto a la esfera, como realmente se está moviendo en el espacio 3D de una forma distinta a la que aparenta, no puedo colocar una luz en un lugar de la escena, ya que según la esfera se va moviendo, la luz le daría desde ángulos distintos a los que el usuario espera, dando una impresión extraña en su movimiento, ya que es un movimiento irreal. Frente a esto, probé tres posibles enfoques. El primero fue elegir un ángulo para la luz constante. En este caso, la iluminación no parecía demasiado real, pero el resultado era aceptable. El segundo fue colocar la luz en una posición muy lejana, para que a la esfera no le afecte mucho el cambio de ángulo mientras se mueve en el espacio 3D. Este enfoque produjo resultados aceptables. Pese a todo, mi decisión final fue quedarme sólo con iluminación ambiental (al 100\% de intensidad) para la esfera, ya que como la textura que le apliqué es de una esfera de discoteca, creo que es lógico que la propia esfera no sea iluminada externamente.
+
+Con respecto al triángulo, le he aplicado iluminación ambiental más atenuada que a la esfera, y también iluminación difusa. En este caso, no considero que el efecto que produce la iluminación difusa parezca irreal.
 
 \subsection{Texturizado}
 
+Como ya he comentado, he decidido aplicarle una textura de esfera de discoteca a la esfera, y no aplicarle ninguna textura al triángulo (aunque sí sería posible, ya que he realizado el mapeado de las tres mallas). De esta forma, considero que se parece un poco más al juego en que basé mi idea (\ref{hocus}).
+
+En la aplicación, uso dos shaders separados, uno que aplica texturizado y otro que no.
+
+\subsection{Interpolador} \label{interpolador}
+
+Para que la esfera se mueva entre las distintas posiciones automáticamente, he creado una clase que se encarga de realizar automáticamente los cálculos de interpolación entre distintas posiciones.
+
+Esto lo hace usando un algoritmo lineal, al que se le indica un tiempo máximo para realizar la interpolación, una posición de partida, y una posición de destino. La clase se encarga de realizar todos los cálculos necesarios para permitir el movimiento. En toda la aplicación, solo se utiliza una clase encargada de realizar interpolaciones, ya que solo es la esfera que está en movimiento.
+
+\subsection{Controlador de la esfera} \label{controlador_esfera}
+
+También he creado una clase que se encarga de controlar todos los aspectos referidos al movimiento de la esfera, no solo la interpolación entre las posiciones individuales de su trayectoria. Esta clase se ayuda del interpolador (\ref{interpolador}).
+
+Concretamente, lo que incluye es una lista de las posiciones por las que tiene que ir pasando la esfera, y le pide al interpolador que se encargue de realizar la interpolación entre cada una de las posiciones de su trayectoria. Además, cuando alcanza cualquiera de sus destinos, le indica al interpolador que pase a calcular la interpolación para llegar a la siguiente posición.
+
+Adicionalmente, mantiene información sobre el estado actual de movimiento de la esfera, que se guarda como números correspondientes a cada pequeña trayectoria dentro del recorrido general, del 0 al 13.
+
+La información sobre el estado actual se utiliza para saber qué partes del triángulo hay que pintar por encima de la esfera y cuál es no, para conseguir el efecto 3D deseado, usando el algoritmo del pintor. Este proceso lo describo a continuación.
+
 \subsection{Algoritmo del pintor} \label{algoritmo_pintor}
+
+Dado que en la aplicación jugamos con ilusiones ópticas, y las coordenadas 3D aparentes no se corresponden con las reales (\ref{posicion}), he tenido que recurrir a una aplicación manual del algoritmo del pintor para conseguir un efecto realista de la ilusión del triángulo de Penrose.
+
+Sirviéndonos de la información del estado actual de movimiento de la esfera (\ref{controlador_esfera}), podemos saber qué partes del triángulo se deben pintar por encima de la misma, y cuáles no. Por ejemplo, en las figuras \ref{estado_1} y \ref{estado_2} vemos que, siendo parte del mismo movimiento, en una parte, la cara oscura del triángulo se pinta por debajo de la esfera, y en la otra, se pinta por encima.
+
+La forma de implementar este efecto es dividiendo el movimiento en dos, por lo que en la primera parte la cara oscura se pinta por debajo, y en la segunda parte se pinta por encima. La transición se hace en un punto intermedio en el que la bola no está tocando con la cara implicada, de forma que la transición no se nota.
+
+\begin{figure}[h]
+    \centering
+    \resizebox*{0.4\textwidth}{!}{
+    \includegraphics{estado_1.png}
+    }
+    \caption{Posición de la esfera al principio del movimiento. Se muestra \textbf{por encima} del segmento más oscuro del triángulo.} \label{estado_1}
+\end{figure}
+\begin{figure}[h]
+    \centering
+    \resizebox*{0.4\textwidth}{!}{
+    \includegraphics{estado_2.png}
+    }
+    \caption{Posición de la esfera al final del movimiento. Se muestra \textbf{por debajo} del segmento más oscuro del triángulo.} \label{estado_2}
+\end{figure}
 
 \section{Comentarios finales}
 
+\newpage
+\section{Bibliografía}
 \bibliography{export}
+
+\newpage
+\appendix
+\section{Controles de la aplicación}
+
+Los controles de la aplicación son los siguientes:
+
+\begin{itemize}
+    \item \textbf{P}: forzar el algoritmo del pintor para el dibujo, dibujando la esfera por encima.
+    \item Posicionado de la esfera:
+    \begin{itemize}
+        \item \textbf{M}: activar o desactivar el posicionado manual de la esfera.
+        \item \textbf{Q}: incrementar manualmente la coordenada X de la esfera.
+        \item \textbf{A}: decrementar manualmente la coordenada X de la esfera.
+        \item \textbf{W}: incrementar manualmente la coordenada Y de la esfera.
+        \item \textbf{S}: decrementar manualmente la coordenada Y de la esfera.
+        \item \textbf{E}: incrementar manualmente la coordenada Z de la esfera.
+        \item \textbf{D}: decrementar manualmente la coordenada Z de la esfera.
+    \end{itemize}
+    \item Control de la cámara:
+    \begin{itemize}
+        \item \textbf{$\uparrow$}: inclinar la cámara hacia arriba manualmente.
+        \item \textbf{$\downarrow$}: inclinar la cámara hacia abajo manualmente.
+        \item \textbf{$\rightarrow$}: inclinar la cámara hacia la derecha manualmente.
+        \item \textbf{$\leftarrow$}: inclinar la cámara hacia la izquierda manualmente.
+    \end{itemize}
+\end{itemize}
+
+\textit{(No recomiendo jugar con la perspectiva de la cámara, ya que se pierde el efecto de la ilusión óptica, pero he decidido mantener la posibilidad de hacerlo.)}
 
 \end{document}
