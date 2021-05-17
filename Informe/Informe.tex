@@ -88,6 +88,8 @@
 
 El \textbf{triángulo de Penrose} es una figura imposible diseñada en 1934 por el artista sueco Oscar Reutersvärd. Sin embargo, no cobró notoriedad hasta 1954, cuando un matemático, Rodzher Penrouz (de ahí el nombre de la figura) escribió un artículo sobre figuras imposibles, que resultó muy llamativo. Desde ese momento pasó a formar parte de la cultura popular.
 
+La figura tiene el aspecto mostrado en \ref{imagen_triangulo}.
+
 \begin{figure}[h]
     \centering
     \resizebox*{0.4\textwidth}{!}{
@@ -95,8 +97,6 @@ El \textbf{triángulo de Penrose} es una figura imposible diseñada en 1934 por 
     }
     \caption{El triángulo de Penrose} \label{imagen_triangulo}
 \end{figure}
-
-La figura tiene el aspecto mostrado en \ref{imagen_triangulo}.
 
 A nivel personal, me resultan especialmente fascinantes todos los temas relacionados con figuras imposibles, y por eso quería que mi proyecto de la asignatura girase en torno a ellas. El triángulo de Penrose me pareció la figura más icónica que existe, entre las figuras imposibles, y por eso he desarrollado mi proyecto sobre la misma.
 
@@ -112,13 +112,17 @@ Para hacer el desarrollo, me he basado en un juego de móvil llamado \textit{hoc
     \caption{Nivel 4 de \textit{hocus}} \label{nivel_hocus}
 \end{figure}
 
+Para diseñar la aplicación, he tratado de basar mi idea en la del diseño que han hecho en este juego, que sigue un estilo minimalista, y en el que se puede ver una figura que se va moviendo alrededor del triángulo de Penrose.
+
+La idea que tomado para mi aplicación ha sido la misma: mostrar al usuario la ilusión óptica del triángulo de Penrose, con una esfera que va dando vueltas alrededor del mismo de una forma que es físicamente imposible.
+
 \section{Diseño del modelo 3D}
 
 \subsection{Obtención del modelo}
 
-He comenzado con un modelo 3D disponible en \cite{modeloTriangulo}. Se trata de una página destinada a la impresión 3D, así que el modelo que ofrecían no era exactamente el apropiado para importar en la aplicación. Por eso tuve que editarlo de forma adecuada en Blender.
+He comenzado con un modelo 3D disponible en \cite{modeloTriangulo}. Se trata de una página destinada a la impresión 3D, así que el modelo que ofrecían no era exactamente el apropiado para importar en la aplicación, ya que estaba adaptado para ser imprimible en el mundo real. Por eso tuve que editarlo de forma adecuada en Blender.
 
-\subsection{Edición en Blender}
+\subsection{Edición en Blender} \label{edicion_blender}
 
 El modelo que descargué venía con todas las caras creadas, incluso las que en la aplicación aparecen ocultas. Esto, en principio, no debería suponer un problema, pero en la práctica sí lo es, cuando intento aplicar el algoritmo del pintor, que describiré en \ref{algoritmo_pintor}.
 
@@ -139,7 +143,7 @@ Por eso eliminé las caras ocultas del modelo, pasando de \ref{caras_ocultas_sin
     \caption{Modelo editado. Se han eliminado las caras ocultas y se ha separado en piezas.} \label{caras_ocultas_borradas}
 \end{figure}
 
-Además, separé las tres ``caras'' del triángulo, para poder aplicar después el algoritmo del pintor, según las secciones marcadas en rojo en \ref{separacion_caras_triangulo}. Es relevante comentar que, en este documento, llamo ``caras'' a cada una de las tres mallas que he separado, por simplicidad. Técnicamente son mallas compuestas de múltiples caras.
+Además, separé las tres ``caras'' del triángulo, para poder aplicar después el algoritmo del pintor, según las secciones marcadas en rojo en \ref{separacion_caras_triangulo}, de forma aislada. Es relevante comentar que, en este documento, llamo ``caras'' a cada una de las tres mallas que he separado, por simplicidad. Técnicamente son mallas compuestas de múltiples caras.
 
 \begin{figure}[h]
     \centering
@@ -149,11 +153,11 @@ Además, separé las tres ``caras'' del triángulo, para poder aplicar después 
     \caption{Separación de la malla en tres, vista desde la aplicación. Los límites de las caras están marcados en rojo.} \label{separacion_caras_triangulo}
 \end{figure}
 
-También hice el mapeado UV de las mallas, en caso de que quisiera aplicarle una textura posteriormente. Finalmente, deseché esa idea, ya que me pareció que quedaría recargado y sería más elegante un color más plano, como se ve en la versión final de la aplicación. La textura decidí aplicarla a la esfera.
+También hice el mapeado UV de las mallas, en caso de que quisiera aplicarle una textura posteriormente. Finalmente, deseché esa idea, ya que me pareció que quedaría recargado y sería más elegante un color más plano, como se ve en la versión final de la aplicación. La textura decidí aplicarla a la esfera (\ref{texturizado}).
 
 \section{Programación de la aplicación con OpenGL}
 
-En esta sección describiré como he llevado a cabo el proceso de programación de la aplicación.
+En esta sección describiré como he llevado a cabo el proceso de programación de la aplicación, en el que he usado OpenGL 3.3.
 
 \subsection{Estructura del código}
 
@@ -194,7 +198,7 @@ Utilicé el mismo procedimiento para todas las líneas, que son básicamente de 
 
 De esta forma, construí un fichero \texttt{penrose.h}, basándome en el de las prácticas (\texttt{esfera.h}), con la información necesaria sobre la figura.
 
-Pese a todo, como comentaba, realmente son tres mallas separadas, así que en el fichero de información solo incluí datos sobre vértices, normales y texturas, pero no sobre las caras, ya que dependen de cada malla. En el código de la aplicación lo que hago es incluir tres funciones, (\texttt{crearPenroseFrontal}, \texttt{crearPenroseLateral}, y \texttt{crearPenroseTrasero}), y dentro de cada función incluyo un vector con la información adecuada sobre las caras, que después se encarga de procesar un bucle dentro de la función para crear el \texttt{VAO} correspondiente. De esta forma, genera la información necesaria para que OpenGL pueda procesar la información del objeto.
+Pese a todo, como comentaba, realmente son tres mallas separadas, así que en el fichero de información solo incluí datos sobre vértices, normales y texturas (ya que utilizan índices globales a las tres mallas), pero no sobre las caras, ya que dependen de cada malla. En el código de la aplicación lo que hago es incluir tres funciones, (\texttt{crearPenroseFrontal}, \texttt{crearPenroseLateral}, y \texttt{crearPenroseTrasero}), y dentro de cada función incluyo un vector con la información adecuada sobre las caras, que después se encarga de procesar un bucle dentro de la función para crear el \texttt{VAO} correspondiente. De esta forma, genera la información necesaria para que OpenGL pueda procesar la información del objeto.
 
 Una operación importante que hace el bucle es decrementar en una unidad todas las referencias del vector, ya que el formato \texttt{.obj} utiliza indexado en base a 1, y en C los índices empiezan en 0. Es un aspecto importante, que me llevó cierto tiempo descubrir, ya que inicialmente no aplicaba esta operación, y por ello todos los vértices estaban mal referenciados, dando lugar a un dibujo como el recogido en la figura \ref{antes_de_corregir_indexado}.
 
@@ -203,7 +207,7 @@ Una operación importante que hace el bucle es decrementar en una unidad todas l
     \resizebox*{0.5\textwidth}{!}{
     \includegraphics{Penrose_1_no_funciona.png}
     }
-    \caption{Visualización de la aplicación en etapas previas del desarrollo, antes de tener en cuenta que el indexado de vértices, normales y texturas, en el formato \texttt{.obj}, empieza en 0.} \label{antes_de_corregir_indexado}
+    \caption{Visualización de la aplicación en etapas previas del desarrollo, antes de tener en cuenta que el indexado de vértices, normales y texturas, en el formato \texttt{.obj}, empieza en 1.} \label{antes_de_corregir_indexado}
 \end{figure}
 
 \subsection{Pespectiva y visión}
@@ -237,7 +241,7 @@ Con respecto a la esfera, como realmente se está moviendo en el espacio 3D de u
 
 Con respecto al triángulo, le he aplicado iluminación ambiental más atenuada que a la esfera, y también iluminación difusa. En este caso, no considero que el efecto que produce la iluminación difusa parezca irreal.
 
-\subsection{Texturizado}
+\subsection{Texturizado} \label{texturizado}
 
 Como ya he comentado, he decidido aplicarle una textura de esfera de discoteca a la esfera, y no aplicarle ninguna textura al triángulo (aunque sí sería posible, ya que he realizado el mapeado de las tres mallas). De esta forma, considero que se parece un poco más al juego en que basé mi idea (\ref{hocus}).
 
@@ -261,11 +265,9 @@ La información sobre el estado actual se utiliza para saber qué partes del tri
 
 \subsection{Algoritmo del pintor} \label{algoritmo_pintor}
 
-Dado que en la aplicación jugamos con ilusiones ópticas, y las coordenadas 3D aparentes no se corresponden con las reales (\ref{posicion}), he tenido que recurrir a una aplicación manual del algoritmo del pintor para conseguir un efecto realista de la ilusión del triángulo de Penrose.
+Dado que en la aplicación jugamos con ilusiones ópticas, y las coordenadas 3D aparentes no se corresponden con las reales (\ref{posicion}), he tenido que recurrir a una aplicación manual del algoritmo del pintor para conseguir un efecto realista de la ilusión del triángulo de Penrose. Si usase el pintado en base al buffer de profundidad, la bola aparecería por encima o por debajo de algunas partes del triángulo de forma incorrecta, quitándole el efecto realista a la aplicación. Es decir, hace falta controlar de forma manual el orden de pintado de los objetos, para que la ilusión óptica sea realista.
 
-Sirviéndonos de la información del estado actual de movimiento de la esfera (\ref{controlador_esfera}), podemos saber qué partes del triángulo se deben pintar por encima de la misma, y cuáles no. Por ejemplo, en las figuras \ref{estado_1} y \ref{estado_2} vemos que, siendo parte del mismo movimiento, en una parte, la cara oscura del triángulo se pinta por debajo de la esfera, y en la otra, se pinta por encima.
-
-La forma de implementar este efecto es dividiendo el movimiento en dos, por lo que en la primera parte la cara oscura se pinta por debajo, y en la segunda parte se pinta por encima. La transición se hace en un punto intermedio en el que la bola no está tocando con la cara implicada, de forma que la transición no se nota.
+Para ello, sirviéndonos de la información del estado actual de movimiento de la esfera (\ref{controlador_esfera}), podemos saber qué partes del triángulo se deben pintar en cada momento por encima de la misma, y cuáles no.
 
 \begin{figure}[h]
     \centering
@@ -282,9 +284,17 @@ La forma de implementar este efecto es dividiendo el movimiento en dos, por lo q
     \caption{Posición de la esfera al final del movimiento. Se muestra \textbf{por debajo} del segmento más oscuro del triángulo.} \label{estado_2}
 \end{figure}
 
+Por ejemplo, en las figuras \ref{estado_1} y \ref{estado_2} vemos que, siendo parte del mismo movimiento, en una parte, la cara oscura del triángulo se pinta por debajo de la esfera, y en la otra, se pinta por encima.
+
+La forma de implementar este efecto es dividiendo el movimiento en dos, por lo que en la primera parte la cara oscura se pinta por debajo, y en la segunda parte se hace al revés. Por tanto, hay un cambio en algún punto intermedio de la trayectoria, en el orden de dibujo de los objetos de la aplicación. Concretamente, la transición se hace en un punto intermedio en el que la bola no está tocando con la cara implicada, de forma que la transición no se nota.
+
+Este tipo de estrategia la aplico en varios puntos a lo largo de la trayectoria de la esfera, para conseguir el efecto óptico que busco.
+
+También es relevante comentar, como punto final, que el algoritmo del pintor se puede aplicar en este caso porque no existen caras ocultas en los objetos. Si existieran, al realizar el pintado de forma manual, algunas de las caras se verían superpuestas a las que deberían aparecer realmente por encima. Como describí en \ref{edicion_blender}, eliminé las caras ocultas del modelo, precisamente por esta razón.
+
 \section{Comentarios finales}
 
-En la aplicación, en el de la posibilidad de mover manualmente la esfera, pero es cierto que el movimiento resulta bastante extraño debido a la ilusión óptica con la que juega la aplicación. Los controles se encuentran en el apéndice \ref{controles}.
+En la aplicación, he incluido la posibilidad de mover manualmente la esfera, pero si se usa esa posibilidad, hay que tener en cuenta que el movimiento resulta bastante extraño. Esto es debido a la ilusión óptica con la que juega la aplicación. Los controles se encuentran en el apéndice \ref{controles}.
 
 En la entrega del proyecto he incluido tanto el ejecutable, como los ficheros fuente que se pueden usar para compilar el proyecto.
 
