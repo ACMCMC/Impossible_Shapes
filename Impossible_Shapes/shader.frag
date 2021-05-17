@@ -27,5 +27,5 @@ void main()
 
 	vec3 lightIntensity = ambiente + luzDifusa;
 
-	FragColor = vec4(lightIntensity * lightColor, 1.0f);
+	FragColor = vec4(lightIntensity * lightColor * objectColor , 1.0f);
 }

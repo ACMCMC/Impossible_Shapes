@@ -661,7 +661,7 @@ int main()
 	penroseLateral.setDistorsion(glm::vec3(0.05, 0.05, 0.05));
 
 	esfera = Objeto(glm::vec3(1.0f, 1.0f, 1.0f), VAOEsfera, 1080, shaderConTexturas);
-	esfera.setDistorsion(glm::vec3(0.2, 0.2, 0.2));
+	esfera.setDistorsion(glm::vec3(0.25, 0.25, 0.25));
 	esfera.setTextura(cemento);
 
 	myControlador.comenzar(glfwGetTime());

@@ -36,5 +36,5 @@ void main()
 
 	// combinamos
 	vec3 result = (ambient + diffuse) * lightColor;
-	FragColor = vec4(result, 1.0f) * texture(tex, UV);
+	FragColor = texture(tex, UV);
 }
