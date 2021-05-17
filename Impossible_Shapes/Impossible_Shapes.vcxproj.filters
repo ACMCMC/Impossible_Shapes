@@ -18,6 +18,12 @@
     <ClInclude Include="lecturaShader.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
+    <ClInclude Include="esfera.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="penrose.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -26,5 +32,19 @@
     <ClCompile Include="glad.c">
       <Filter>Archivos de origen</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="shader.vert">
+      <Filter>Archivos de recursos</Filter>
+    </None>
+    <None Include="shaderTextura.frag">
+      <Filter>Archivos de recursos</Filter>
+    </None>
+    <None Include="shaderTextura.vert">
+      <Filter>Archivos de recursos</Filter>
+    </None>
+    <None Include="shader.frag">
+      <Filter>Archivos de recursos</Filter>
+    </None>
   </ItemGroup>
 </Project>
